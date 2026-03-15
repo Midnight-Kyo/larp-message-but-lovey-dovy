@@ -1,0 +1,934 @@
+/* Custom Fonts - must be first */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Great+Vibes&family=Inter:wght@300;400;500&display=swap');
+
+@font-face {
+  font-family: 'IM Fell English Custom';
+  src: url('/fonts/IMFellEnglish-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Tailwind CSS Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.625rem;
+    --background: #f5f2ed;
+    --foreground: #2c2416;
+    --card: #faf8f5;
+    --card-foreground: #2c2416;
+    --popover: #faf8f5;
+    --popover-foreground: #2c2416;
+    --primary: #8b4513;
+    --primary-foreground: #faf8f5;
+    --secondary: #e8e2d9;
+    --secondary-foreground: #2c2416;
+    --muted: #e8e2d9;
+    --muted-foreground: #6b5d4d;
+    --accent: #c9a959;
+    --accent-foreground: #2c2416;
+    --destructive: #c9372d;
+    --border: #d4ccc0;
+    --input: #d4ccc0;
+    --ring: #8b4513;
+    --chart-1: #c9a959;
+    --chart-2: #8b4513;
+    --chart-3: #6b5d4d;
+    --chart-4: #d4ccc0;
+    --chart-5: #2c2416;
+    --sidebar: #e8e2d9;
+    --sidebar-foreground: #2c2416;
+    --sidebar-primary: #8b4513;
+    --sidebar-primary-foreground: #faf8f5;
+    --sidebar-accent: #d4ccc0;
+    --sidebar-accent-foreground: #2c2416;
+    --sidebar-border: #d4ccc0;
+    --sidebar-ring: #8b4513;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* 3D Envelope Styles */
+.envelope-scene {
+  perspective: 1200px;
+  perspective-origin: center center;
+}
+
+.envelope-container {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.envelope-container:hover {
+  transform: translateY(-4px);
+}
+
+/* Envelope Body - Main 3D Structure */
+.envelope-body {
+  transform-style: preserve-3d;
+  position: relative;
+  width: 320px;
+  height: 200px;
+  background: linear-gradient(
+    135deg,
+    #e8e0d4 0%,
+    #d4c8b8 25%,
+    #c9bba8 50%,
+    #d4c8b8 75%,
+    #e8e0d4 100%
+  );
+  box-shadow:
+    /* Top edge shadow for thickness */
+    0 -3px 8px rgba(0, 0, 0, 0.15),
+    /* Bottom shadow for depth */
+    0 15px 40px rgba(0, 0, 0, 0.25),
+    0 25px 60px rgba(0, 0, 0, 0.15),
+    /* Inner shadow for paper depth */
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+}
+
+/* Paper texture overlay */
+.envelope-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Envelope thickness/edge effect */
+.envelope-edge {
+  position: absolute;
+  background: linear-gradient(to bottom, #b8a890, #a69680);
+}
+
+.envelope-edge-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transform: translateY(-100%);
+  background: linear-gradient(to bottom, #d4c8b8, #c9bba8);
+}
+
+.envelope-edge-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transform: translateY(100%);
+  background: linear-gradient(to bottom, #c9bba8, #b8a890);
+}
+
+/* Envelope Flap - The triangular top */
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+
+.envelope-flap-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    #e8e0d4 0%,
+    #ddd3c4 40%,
+    #d4c8b8 100%
+  );
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.envelope-flap-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Flap shadow overlay for depth */
+.envelope-flap-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 60%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+  pointer-events: none;
+}
+
+/* Flap opened state */
+.envelope-flap.open {
+  transform: rotateX(180deg);
+}
+
+/* Side Flaps - visible when main flap opens */
+.envelope-side-flap-left,
+.envelope-side-flap-right {
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 180px;
+  background: linear-gradient(135deg, #d4c8b8, #c9bba8);
+  z-index: 5;
+}
+
+.envelope-side-flap-left {
+  left: 0;
+  clip-path: polygon(0 0, 100% 60%, 0 100%);
+  transform-origin: left center;
+}
+
+.envelope-side-flap-right {
+  right: 0;
+  clip-path: polygon(100% 0, 0 60%, 100% 100%);
+  transform-origin: right center;
+}
+
+/* Bottom flap */
+.envelope-bottom-flap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to top, #d4c8b8, #c9bba8);
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+  z-index: 6;
+}
+
+/* Wax Seal */
+.wax-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+  width: 56px;
+  height: 56px;
+  z-index: 20;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wax-seal:hover {
+  transform: translate(-50%, -30%) scale(1.05);
+}
+
+.wax-seal-body {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 30% 30%,
+    #c9372d 0%,
+    #a82a22 40%,
+    #8b1f18 100%
+  );
+  box-shadow:
+    /* Main shadow */
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    /* Inner depth */
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    /* Edge highlight */
+    inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Wax texture */
+.wax-seal-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='waxNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23waxNoise)'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+}
+
+/* Wax irregular edge effect */
+.wax-seal-body::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(139, 31, 24, 0.3);
+  filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='rough'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.05' numOctaves='2' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='2'/%3E%3C/filter%3E");
+}
+
+/* Seal impression/text */
+.seal-impression {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seal-impression::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+/* Seal shine/highlight */
+.seal-shine {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 16px;
+  height: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: 50%;
+  transform: rotate(-30deg);
+  filter: blur(1px);
+}
+
+/* Seal cracking animation */
+@keyframes sealCrack {
+  0% {
+    transform: translate(-50%, -30%) scale(1);
+  }
+  20% {
+    transform: translate(-50%, -30%) scale(0.95);
+  }
+  40% {
+    transform: translate(-50%, -30%) scale(1.02);
+  }
+  60% {
+    transform: translate(-50%, -30%) scale(0.98);
+  }
+  100% {
+    transform: translate(-50%, -30%) scale(1);
+  }
+}
+
+.wax-seal.cracking {
+  animation: sealCrack 0.4s ease-out;
+}
+
+.wax-seal.cracked {
+  opacity: 0;
+  transform: translate(-50%, -30%) scale(0.8);
+  transition: all 0.5s cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Crack lines SVG */
+.crack-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.wax-seal.cracking .crack-lines {
+  opacity: 1;
+}
+
+/* Idle floating animation */
+@keyframes envelopeFloat {
+  0%, 100% {
+    transform: translateY(0) rotateX(5deg);
+  }
+  50% {
+    transform: translateY(-8px) rotateX(5deg);
+  }
+}
+
+@keyframes envelopeShadow {
+  0%, 100% {
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 28px 50px rgba(0, 0, 0, 0.25));
+  }
+}
+
+.envelope-wrapper.idle {
+  animation: envelopeFloat 4s ease-in-out infinite, envelopeShadow 4s ease-in-out infinite;
+}
+
+/* Letter Paper */
+.letter-paper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(-10px);
+  width: 300px;
+  min-height: 400px;
+  background: linear-gradient(
+    to bottom,
+    #faf8f5 0%,
+    #f5f2ed 100%
+  );
+  border-radius: 2px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 48px 40px;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.letter-paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.letter-paper.visible {
+  opacity: 1;
+  transform: translate(-50%, -120%) translateZ(0);
+}
+
+/* Reading phase paper sheet */
+.reading-letter-sheet {
+  position: relative;
+  border-radius: 5px;
+  padding: 3.25rem 2.75rem;
+  background-color: #f7f0e4;
+  background-image:
+    /* Fine grain fallback (kept soft) */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E"),
+    /* Physical paper color map */
+    url('/paper/Paper001_2K-JPG_Color.jpg'),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 253, 248, 0.74) 18%,
+      rgba(244, 235, 221, 0.64) 54%,
+      rgba(233, 221, 204, 0.72) 100%
+    );
+  background-size: 380px 380px, cover, 100% 100%;
+  background-position: center, center, center;
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-blend-mode: soft-light, normal, normal;
+  box-shadow:
+    0 12px 34px rgba(26, 15, 4, 0.12),
+    0 2px 8px rgba(26, 15, 4, 0.07),
+    0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(120, 88, 52, 0.08),
+    inset 0 12px 26px rgba(255, 255, 255, 0.19),
+    inset 0 -10px 22px rgba(118, 94, 62, 0.07);
+  overflow: hidden;
+}
+
+.reading-letter-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.48) 0%,
+      rgba(255, 255, 255, 0.2) 26%,
+      rgba(240, 231, 216, 0.2) 56%,
+      rgba(225, 211, 189, 0.3) 100%
+    ),
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.2), transparent 60%),
+    radial-gradient(circle at 3% 50%, rgba(111, 85, 51, 0.12), transparent 24%),
+    radial-gradient(circle at 97% 50%, rgba(111, 85, 51, 0.12), transparent 24%);
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+.reading-letter-sheet > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Letter typography */
+.letter-content {
+  font-family: 'IM Fell English Custom', 'Cormorant Garamond', Georgia, serif;
+  color: #2c2416;
+  line-height: 1.9;
+}
+
+.preview-letter-content {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.preview-letter-content.preview-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.preview-letter-heading {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.preview-letter-kicker {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(84, 68, 48, 0.62);
+}
+
+.preview-letter-title {
+  margin-top: 0.28rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.45rem;
+  font-style: italic;
+  color: rgba(63, 44, 24, 0.86);
+  letter-spacing: 0.02em;
+}
+
+.preview-paragraph {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.preview-visible .preview-paragraph {
+  animation: previewParagraphReveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.preview-paragraph-lead {
+  animation-delay: 0.14s;
+}
+
+.drop-cap-preview {
+  float: left;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.7em;
+  line-height: 0.8;
+  font-weight: 500;
+  color: rgba(61, 43, 24, 0.9);
+  padding-right: 0.12em;
+  padding-top: 0.04em;
+}
+
+.preview-closing {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.preview-visible .preview-closing {
+  animation: previewParagraphReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.62s;
+}
+
+@keyframes previewParagraphReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reading-body-block {
+  margin-top: 0.5rem;
+}
+
+.reading-scroll-shell {
+  background: linear-gradient(180deg, rgba(247, 242, 234, 0.82), rgba(240, 234, 224, 0.7));
+}
+
+.reading-hero {
+  text-align: center;
+  padding: 0.5rem 0 2.2rem;
+}
+
+.reading-hero-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.95rem;
+  margin-bottom: 1.1rem;
+}
+
+.reading-hero-line {
+  width: 6.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.55), transparent);
+}
+
+.reading-hero-star {
+  color: rgba(139, 69, 19, 0.4);
+  font-size: 0.9rem;
+}
+
+.reading-hero-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.95;
+  margin-bottom: 1rem;
+}
+
+.reading-hero-title-italic {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 8vw, 4.2rem);
+  font-style: italic;
+  color: rgba(57, 48, 39, 0.9);
+  font-weight: 400;
+}
+
+.reading-hero-title-bold {
+  font-family: 'IM Fell English Custom', 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.45rem, 8.2vw, 4.3rem);
+  color: rgba(24, 20, 15, 0.96);
+  font-weight: 600;
+}
+
+.reading-hero-date {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.86rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(84, 72, 56, 0.58);
+}
+
+.reading-letter-body {
+  text-align: left;
+  max-width: 680px;
+  margin: 0 auto;
+  color: rgba(41, 32, 23, 0.94);
+}
+
+.letter-reading-paragraph {
+  margin-bottom: 1.55rem;
+  line-height: 2;
+  font-size: 1.24rem;
+}
+
+.letter-reading-lead {
+  margin-top: 0.2rem;
+}
+
+.drop-cap-reading {
+  float: left;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 3.25em;
+  line-height: 0.78;
+  font-weight: 500;
+  color: rgba(32, 24, 17, 0.88);
+  padding-right: 0.1em;
+  padding-top: 0.03em;
+}
+
+.reading-paragraph-break {
+  margin-bottom: 2.7rem;
+}
+
+.letter-reading-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.letter-salutation {
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.letter-salutation-centered {
+  text-align: center;
+  margin-bottom: 2.35rem;
+  color: rgba(56, 43, 30, 0.85);
+}
+
+.reading-section {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.62s ease, transform 0.62s ease;
+}
+
+.reading-section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reading-section + .reading-section {
+  margin-top: 0.35rem;
+}
+
+.reading-section-tagline {
+  margin: 0 0 1.15rem;
+  text-align: center;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(96, 74, 50, 0.56);
+}
+
+.reading-section-divider {
+  margin: 2.25rem 0 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.reading-section-divider-line {
+  width: 3.4rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(97, 74, 49, 0.36), transparent);
+}
+
+.reading-section-divider-dot {
+  font-size: 0.8rem;
+  color: rgba(97, 74, 49, 0.45);
+}
+
+.letter-body {
+  font-size: 1.125rem;
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+}
+
+.letter-closing {
+  font-size: 1.125rem;
+  font-style: italic;
+  margin-top: 0;
+  color: rgba(62, 45, 30, 0.86);
+}
+
+.letter-signature {
+  font-size: 2.25rem;
+  font-family: 'IM Fell English Custom', 'Cormorant Garamond', Georgia, serif;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.015em;
+  margin-top: 0.5rem;
+  color: rgba(71, 46, 28, 0.84);
+  opacity: 0.92;
+  transform-origin: left center;
+}
+
+.signature-section .letter-signature {
+  opacity: 0;
+  filter: blur(0.4px);
+  clip-path: inset(0 100% 0 0);
+}
+
+.signature-section {
+  margin-top: 4.2rem;
+  position: relative;
+}
+
+.reading-heart-mark {
+  position: absolute;
+  right: 0.2rem;
+  top: 0.8rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: rgba(116, 58, 40, 0.55);
+  opacity: 0;
+  transform: translateY(6px) rotate(-8deg) scale(0.95);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.reading-heart-mark.reading-heart-visible {
+  opacity: 0.95;
+  transform: translateY(0) rotate(-8deg) scale(1);
+}
+
+.signature-section.signature-ready .letter-signature.signature-reveal {
+  animation: signatureWriteIn 1.75s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes signatureWriteIn {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    filter: blur(0.7px);
+    transform: translateY(4px);
+  }
+  35% {
+    opacity: 0.76;
+  }
+  100% {
+    opacity: 0.92;
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* Envelope exit animation */
+@keyframes envelopeExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(100px);
+  }
+}
+
+.envelope-wrapper.exit {
+  animation: envelopeExit 0.6s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+/* Hint text */
+.hint-text {
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.875rem;
+  color: #6b5d4d;
+  opacity: 0.7;
+  white-space: nowrap;
+  animation: hintPulse 2s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .envelope-body {
+    width: 280px;
+    height: 175px;
+  }
+  
+  .envelope-flap {
+    height: 105px;
+  }
+  
+  .wax-seal {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .seal-impression {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .letter-paper {
+    width: 260px;
+    padding: 36px 28px;
+    min-height: 350px;
+  }
+
+  .reading-letter-sheet {
+    padding: 2.25rem 1.25rem;
+  }
+
+  .reading-hero-line {
+    width: 4rem;
+  }
+
+  .reading-hero-date {
+    letter-spacing: 0.22em;
+  }
+  
+  .letter-salutation {
+    font-size: 1.125rem;
+  }
+  
+  .letter-body {
+    font-size: 1rem;
+  }
+
+  .letter-reading-paragraph {
+    font-size: 1.06rem;
+    line-height: 1.92;
+  }
+
+  .letter-signature {
+    font-size: 1.9rem;
+  }
+
+  .reading-section-tagline {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+  }
+
+  .reading-heart-mark {
+    right: 0;
+    font-size: 2.1rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .envelope-wrapper.idle,
+  .hint-text,
+  .envelope-flap,
+  .wax-seal,
+  .letter-paper,
+  .reading-section,
+  .signature-section.signature-ready .letter-signature.signature-reveal {
+    animation: none;
+    transition: none;
+  }
+}
